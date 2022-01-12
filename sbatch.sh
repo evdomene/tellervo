@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH -o std_%J.out
 #SBATCH -e std_%J.err
-#SBATCH --time=04:00:00
+#SBATCH --time=00:10:00
 #SBATCH --mem=4GB
-#SBATCH --cpus-per-task=2
-#SBATCH --partition=small
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=test
 #SBATCH --account=project_2002552
+#SBATCH --mail-type=END
+#SBATCH --mail-user=eva.domenechmoreno@helsinki.fi
 
 export TMPDIR=$PWD
 export SINGULARITY_TMPDIR=$PWD
