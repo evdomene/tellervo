@@ -1,0 +1,22 @@
+# Windows
+Thumbs.db
+desktop.ini
+
+# OS X
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+
+# Nextflow
+.nextflow*
+work/
+data/
+results/
+testing/
+testing*
+*.pyc
+*.so
+std_*
+
+
