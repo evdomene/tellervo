@@ -3,9 +3,11 @@
 #SBATCH -e std_%J.err
 #SBATCH --time=00:10:00
 #SBATCH --mem=4GB
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 #SBATCH --partition=test
 #SBATCH --account=project_2002552
+#SBATCH --mail-type=END
+#SBATCH --mail-user=eva.domenechmoreno@helsinki.fi
 
 export TMPDIR=$PWD
 export SINGULARITY_TMPDIR=$PWD

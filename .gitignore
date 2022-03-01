@@ -17,7 +17,11 @@ testing/
 testing*
 *.pyc
 *.so
+
+
+# Slurm
 slurm*
 std_*
+sbatch.sh
 
 
