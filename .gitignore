@@ -17,7 +17,7 @@ testing/
 testing*
 *.pyc
 *.so
-slrum*
+slurm*
 std_*
 
 

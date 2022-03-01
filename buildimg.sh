@@ -11,5 +11,5 @@ unset XDG_RUNTIME_DIR
 cd $LOCAL_SCRATCH
 
 singularity pull --name yolov5.simg  docker://ultralytics/yolov5:v6.0
-mv yolov5.simg  /scratch/project_2002552/domeneva/
+mv yolov5.simg  /scratch/project_2002552/nextflow/tellervo/data/
 

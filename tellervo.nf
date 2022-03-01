@@ -1,26 +1,25 @@
 #!/usr/bin/env nextflow
 
-//Image Annotation Conversion base on https://gist.github.com/vdalv/321876a7076caaa771d47216f382cba5](https://gist.github.com/vdalv/321876a7076caaa771d47216f382cba5
+//Channels
+model_ch = Channel.fromPath("$params.weights")
+images_ch = Channel.fromPath("$params.img")
 
 
-//Prepare dataset train/val/test using splitfolder
+//Inference process
+process predict {
 
+publishDir 'runs', mode:'copy'
 
-//Train process 
-
-process train {
 input:
-//datayaml file check right paths
-//weights?
+path images from images_ch
+val weights from model_ch
 
 output:
-//model file and tensorboard. All in run folder 
+file 'runs/detect' into results_ch
 
 script:
 '''
-python train.py --img 416 --batch 8 --epochs 500 --data $datayaml --weights yolov5s.pt --cache
+echo python detect.py --weights $weights --img 416 --conf 0.1 --source $images --save-txt  --save-conf 
 '''
 
 }
-
-//Inference process
