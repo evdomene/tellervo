@@ -23,5 +23,5 @@ testing*
 slurm*
 std_*
 sbatch.sh
-
+buildimg.sh
 
