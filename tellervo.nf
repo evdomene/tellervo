@@ -2,25 +2,70 @@
 
 //Channels
 model_ch = Channel.fromPath("$params.weights")
-images_ch = Channel.fromPath("$params.img")
+images_ch = Channel.fromPath("$params.img/*.jpeg")
 conf_ch = Channel.from("$params.confidence")
+
+
+log.info """\
+         ***      TELLU CLASSIFIER       *** 
+         ===================================
+         model: ${params.weights}
+         images: ${params.img}
+         confidence: ${params.confidence}
+         """
+         .stripIndent()
 
 //Inference process
 process predict {
 
-publishDir 'results', mode:'copy'
+publishDir 'results', pattern:'*.jpeg', mode:'move'
 
 input:
 path images from images_ch
-file weights from model_ch
-val c from conf_ch
+val weights from model_ch.first()
+val c from conf_ch.first()
 
 output:
-file 'out' into results_ch
+file 'raw/exp/labels/*.txt' into predictions_ch
+file 'raw/exp/*.jpeg' into detections_ch
 
 script:
 """
-python /usr/src/app/detect.py --weights ${weights} --img 416 --conf ${c} --project out --source ${images} --save-txt  --save-conf 
+python /usr/src/app/detect.py --weights $weights --img 416 --conf $c --project raw --source ${images} --save-txt  --save-conf 
 """
 
 }
+
+
+process tidydata {
+    input:
+    file predictions from predictions_ch
+
+    output:
+    file '*tidy.txt' into results_ch
+
+    script:
+    """
+    #!/usr/bin/env Rscript
+
+    library(tidyverse)
+    
+    filename <- c("${predictions}")
+    data <- read.table("${predictions}", sep=" ", header = F) %>% 
+        rename(class=V1, x=V2, y=V3, w=V4, h=V5, precision=V6) %>% 
+        mutate(filename = str_replace(filename, " ", ""),
+                filename=str_replace(filename, ".txt", ""), 
+             class = case_when(
+             class==0 ~ "organoid0",
+             class==1 ~ "organoid1",
+             class==2 ~ "organoid3",
+             class==3 ~ "spheroid"
+           ), 
+           area = x*y)
+
+    write_tsv(data, paste0(filename, "tidy.txt"))
+    
+    """
+}
+
+results_ch.collectFile(name: "AllPredictions.txt", storeDir: 'results')

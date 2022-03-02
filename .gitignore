@@ -11,13 +11,19 @@ desktop.ini
 # Nextflow
 .nextflow*
 work/
-data/
 results/
 testing/
 testing*
 *.pyc
 *.so
 
+# Files
+*.pt
+*.jpeg
+*.jpg
+*.tiff
+*.mov
+*.yaml
 
 # Slurm
 slurm*
