@@ -31,3 +31,9 @@ std_*
 sbatch.sh
 buildimg.sh
 
+# Slurm
+slurm*
+std_*
+sbatch.sh
+buildimg.sh
+
