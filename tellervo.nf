@@ -17,26 +17,25 @@ log.info """\
 
 //Inference process
 process predict {
+    publishDir "results", pattern: 'images/exp/*.jpeg', mode:'move'
 
-publishDir 'results', pattern:'*.jpeg', mode:'move'
+    input:
+    path images from images_ch
+    val weights from model_ch.first()
+    val c from conf_ch.first()
 
-input:
-path images from images_ch
-val weights from model_ch.first()
-val c from conf_ch.first()
+    output:
+    file 'images/exp/labels/*.txt' into predictions_ch
+    file ("images/exp/*.jpeg") 
 
-output:
-file 'raw/exp/labels/*.txt' into predictions_ch
-file 'raw/exp/*.jpeg' into detections_ch
-
-script:
-"""
-python /usr/src/app/detect.py --weights $weights --img 416 --conf $c --project raw --source ${images} --save-txt  --save-conf 
-"""
+    script:
+    """
+    python /usr/src/app/detect.py --weights $weights --img 416 --conf $c --project images --source ${images} --save-txt  --save-conf 
+    """
 
 }
 
-
+//Join predictions in a single file with header and class labels
 process tidydata {
     input:
     file predictions from predictions_ch
@@ -60,12 +59,13 @@ process tidydata {
              class==1 ~ "organoid1",
              class==2 ~ "organoid3",
              class==3 ~ "spheroid"
-           ), 
-           area = x*y)
+           ))
 
     write_tsv(data, paste0(filename, "tidy.txt"))
     
     """
 }
 
-results_ch.collectFile(name: "AllPredictions.txt", storeDir: 'results')
+//Get image with detections and table with all predictions in a results folder
+results_ch.collectFile(name: "AllPredictions.txt", storeDir: 'results', keepHeader:true)
+
