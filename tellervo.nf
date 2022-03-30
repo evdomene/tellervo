@@ -7,11 +7,12 @@ conf_ch = Channel.from("$params.confidence")
 
 
 log.info """\
-         ***      TELLU CLASSIFIER       *** 
-         ===================================
+         ***      TELLU ORGANOID CLASSIFIER       *** 
+         ============================================
          model: ${params.weights}
          images: ${params.img}
          confidence: ${params.confidence}
+         output dir: ${params.outdir}
          """
          .stripIndent()
 
@@ -20,7 +21,7 @@ log.info """\
 
 //Inference process
  process predict {
-    publishDir "results", pattern: 'images/exp/*.jpeg', mode:'move'
+    publishDir "results/${params.outdir}", pattern: 'images/exp/*.jpeg', mode:'move'
 
     input:
     path images from images_ch
@@ -28,7 +29,7 @@ log.info """\
     val c from conf_ch.first()
 
      output:
-     file 'images/exp/labels/*.txt' into predictions_ch
+     file 'images/exp/labels/*.txt' optional true into predictions_ch
      file ("images/exp/*.jpeg") 
 
      script:
@@ -41,7 +42,7 @@ log.info """\
 //Join predictions in a single file with header and class labels
 process tidydata {
     echo true
-    publishDir "results", patter:'AllPredictions.txt', mode:'move'
+    publishDir "results/${params.outdir}", patter:'AllPredictions.txt', mode:'move'
 
     input:
     file predictions from predictions_ch.collect()
