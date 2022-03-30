@@ -40,34 +40,19 @@ log.info """\
 
 //Join predictions in a single file with header and class labels
 process tidydata {
+    echo true
+    publishDir "results", patter:'AllPredictions.txt', mode:'move'
+
     input:
-    file predictions from predictions_ch
+    file predictions from predictions_ch.collect()
 
     output:
-    file '*tidy.txt' into results_ch
+    file 'AllPredictions.txt' 
 
     script:
     """
-    #!/usr/bin/env Rscript
-
-    library(tidyverse)
-    
-    filename <- c("${predictions}")
-    data <- read.table("${predictions}", sep=" ", header = F) %>% 
-        rename(class=V1, x=V2, y=V3, w=V4, h=V5, precision=V6) %>% 
-        mutate(filename = str_replace(filename, " ", ""),
-        filename=str_replace(filename, ".txt", ""), 
-           class = case_when(
-           class==0 ~ "organoid0",
-           class==1 ~ "organoid1",
-           class==2 ~ "organoid3",
-           class==3 ~ "spheroid"
-        ))
-
-    write_tsv(data, paste0(filename, "tidy.txt"))
+    tidydata.py "${predictions}"
     """
 }
-//Get image with detections and table with all predictions in a results folder
-results_ch.collectFile(name: "AllPredictions.txt", storeDir: 'results', keepHeader:true)
 
 
