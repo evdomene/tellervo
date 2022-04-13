@@ -17,17 +17,17 @@ for file in file_list:
 df = pd.concat(frames, axis=0) 
 
 #add columnames
-df.columns=['class', 'x', 'y', 'w', 'h', 'precision', 'filename'] 
+df.columns=['class', 'x', 'y', 'w', 'h', 'confidence', 'filename'] 
 
 #The w h are the width and height of the bounding box divided by the size of the image. 
 #To get px^2 you should multiply each value by the size of the image. 
 df['area'] = df["w"]*df["h"]
-df = df[["class", "precision", "area", "filename"]]
+df = df[["class", "confidence", "area", "filename"]]
 
 #match class to human label
 mtch = {0: "organoid0", 1: "organoid1", 2:"organoid3", 3:"spheroid" }
 df = df.replace({"class":mtch})
 
 #Write file
-df.to_csv(r'AllPredictions.txt', index=None, sep=' ') 
+df.to_csv(r'AllDetections.txt', index=None, sep=' ') 
 df.head()
