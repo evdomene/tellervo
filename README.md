@@ -11,9 +11,11 @@
 
 Tellu is a deep convolutional network (Yolov5) trained to classify mouse intestinal organoids from light-transmitted images into 4 classes based on morphology: 
 
-<img src="./data/readme/ClassesOrganoids.png" alt="Classes of organoids detected by Tellu" width="500"/>
+<p align="center">
+<img src="./data/readme/ClassesOrganoids.png" alt="Classes of organoids detected by Tellu" width="1000"/>
+</p>
 
-Tellu works best with images taken from the EVOS FL microscope or NikoPrimo3 microscope at 4X. 
+Tellu works best with images taken from the EVOS FL microscope or Nikon Eclipse Ti-E (3) Primo3 microscope at 4X. 
 
 Tellu outputs a folder with all the detections drawn in the images and also a text file where each row is a detected organoid, the class, confidence of the prediction and relative area of the bounding box (arbitrary units).
 
@@ -21,18 +23,25 @@ Tellu outputs a folder with all the detections drawn in the images and also a te
 <img src="./data/readme/outputimage.png" alt="Representative output file" width="1000">
 </p>
 
-There are two ways to use Tellu: You can run Tellu using the Google Colaboraty environment or locally on your computer.
+There are two ways to use Tellu: You can run Tellu using the Google Colaboratory environment or locally on your computer.
 
 ## 1. Google Collab (No coding experience needed)
 
-The easiest way to use Tellu for inference of your data is through Google Colaboratory notebook. [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1j-jutA52LlPuB4WGBDaoAhimqXC3xguX?usp=sharing)
+The easiest way to use Tellu for inference of your data is through Google Colab [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1j-jutA52LlPuB4WGBDaoAhimqXC3xguX?usp=sharing)
 <br>
 
 ## 2. Nextflow pipeline (requires basic interaction with the terminal)
 
-In case you prefer to run Tellu locally, we have created a nextflow pipeline that runs Tellu and tidies the output detections in a single file with an extra column with the filename information. The pipeline also outputs the images with the detections drawn so you can assess how good has it been.  
+It can be used on any POSIX compatible system (Linux, OS X, etc)
+
+> **Note**:
+> The pipeline is written in DSL1. The latest versions of Nextflow that support it are 22.04.x and 22.10.x. We are currently updating the pipeline to DSL2. 
+
+In case you prefer to run Tellu locally, we have created a Nextflow pipeline that runs Tellu and tidies the output detections in a single file with an extra column with the filename information. The pipeline also outputs the images with the detections drawn so you can assess how good has it been.  
 
 ### Installation
+
+Nextflow requires Java 11 or later.
 
 - Install docker desktop and start it if not started automatically (<https://www.docker.com/get-started/>).  
 - Install Nextflow by running the following code in the terminal (macOS/Unix): (<https://www.nextflow.io/docs/latest/getstarted.html>)
@@ -52,6 +61,12 @@ nextflow run evdomene/tellervo --ext tif --inputdir /path/to/your/images
 An easy way to get the path to your image folder is after typing --inputdir to drag the folder from finder to the terminal and it will write the whole path automatically.  
 
 Note that the first time the pipeline is run, it will need to download the GitHub repository and the docker images needed to run Tellu, and therefore it will take more time than the second time you use it.  
+
+**Parameters**
+
+* --inputdir: folder with the images/videos to be analyzed. Avoid empty spaces in the filenames. 
+* --ext: file extension of the files to be analyzed. Tellu accepts jpeg, tiff, tif, png, bmp, avi, mp4, mov, m4v, wmv, mkv.
+* --outdir: folder to store results.
 
 For help and options available you can run:  
 
