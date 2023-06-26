@@ -33,9 +33,6 @@ The easiest way to use Tellu for inference of your data is through Google Colab 
 
 It can be used on any POSIX compatible system (Linux, OS X, etc)
 
-> **Note**:
-> The pipeline is written in DSL1. The latest versions of Nextflow that support it are 22.04.x and 22.10.x. We are currently updating the pipeline to DSL2.
-
 In case you prefer to run Tellu locally, we have created a Nextflow pipeline that runs Tellu and tidies the output detections in a single file with an extra column with the filename information. The pipeline also outputs the images with the detections drawn so you can assess how good has it been.
 
 ### Installation
@@ -83,7 +80,7 @@ After obtaining the detection file a common downstream analysis would be to read
 
 **Option 1: Metadata is in a separate file**
 
-If the metadata information is in a separate file that has the filename of the images and the rest of the biological information you can add this information in R using left_join() from _tidyverse_ package:
+If the metadata information is in a separate file that has the filename of the images and the rest of the biological information you can add this information in R using left*join() from \_tidyverse* package:
 
 ```r
 library(tidyverse)
@@ -99,7 +96,7 @@ data <- read_tsv("AllDetections.txt") %>%
 
 **Option 2: Metadata is in the filename**
 
-If the metadata information is in the filename (e.g Date_Treatment_Well1.txt) this information can easily be added as columns in R using the separate() function from _tidyverse_. Note that is important that the separator used between information is constant and preferentially the same pattern is consistent between filenames.
+If the metadata information is in the filename (e.g Date*Treatment_Well1.txt) this information can easily be added as columns in R using the separate() function from \_tidyverse*. Note that is important that the separator used between information is constant and preferentially the same pattern is consistent between filenames.
 
 ```r
 library(tidyverse)
