@@ -10,7 +10,6 @@
 ========================================================================================
 ========================================================================================
 */
-nextflow.enable.dsl=1
 
 def helpMessage() {
     log.info"""
@@ -19,14 +18,14 @@ def helpMessage() {
     =========================================
     Usage:
     The typical command for running the pipeline is as follows:
-    nextflow run evdomene/tellervo --ext 'tif' --inputdir '/images/folder/' 
+    nextflow run evdomene/tellervo --inputdir '/images/folder/' 
     
     Required arguments:
          --inputdir      Path to directory where the images/videos are located. Default data/images
-         --ext           Extension of the files to be analyzed. Default jpeg (jpeg, tiff, tif, png, bmp, avi, mp4, mov, m4v, wmv, mkv) 
+          
          
     Optional arguments:
-        --outdir         Name of the output directory. If not provided results are stored in results
+        --outputdir         Name of the output directory. If not provided results are stored in results
         --weights        Path to model weights. By default data/models/Telluweights.pt
          
     
@@ -40,54 +39,70 @@ if (params.help){
     exit 0
 }
 
-//Channels
-model_ch = Channel.fromPath("$params.weights")
-images_ch = Channel.fromPath("$params.inputdir/*.$params.ext")
-
 
 log.info """\
          ***       TELLU - INTESTINAL ORGANOID CLASSIFIER       *** 
          ==========================================================
          images: ${params.inputdir}
-         output dir: results/${params.outdir}
+         output dir: ${params.outputdir}
          """
          .stripIndent()
 
 
 //Inference process
- process predict {
-    publishDir "results/${params.outdir}", pattern: "images/exp/*${params.ext}", mode:'move'
+process RunTellu {
+
+    publishDir path: params.outputdir, mode: 'copy'
 
     input:
-    path images from images_ch
-    val weights from model_ch.first()
-   
-     output:
-     file 'images/exp/labels/*.txt' optional true into predictions_ch
-     file ("images/exp/*.$params.ext") 
-
-     script:
-     """
-     python /usr/src/app/detect.py --weights $weights --img 416 --conf 0.35 --project images --source ${images} --save-txt  --save-conf --hide-labels 
-     """
-
-}
-
-//Join predictions in a single file with header and class labels
-process tidydata {
-    echo true
-    publishDir "results/${params.outdir}", pattern:'AllDetections.txt', mode:'move'
-
-    input:
-    file predictions from predictions_ch.collect()
+    path images 
+    val tellu
 
     output:
-    file 'AllDetections.txt' 
+    path 'out/exp/labels/*.txt', emit: detections, optional: true
+    file ("out/exp/*") 
 
     script:
     """
-    tidydata.py "${predictions}"
+    python /usr/src/app/detect.py --weights $tellu --img 416 --conf 0.35 --project out --source $images --save-txt  --save-conf --hide-labels 
     """
+
+   
+
+   
+
 }
 
 
+//Join predictions in a single file with header and class labels
+
+process TidyData {
+    debug true
+    publishDir path: params.outputdir, mode: 'move'
+
+    input:
+    file detections 
+
+    output:
+    file 'AllDetections.csv' 
+    file 'summary.csv'
+
+    script:
+    """
+    tidydata.py $detections
+    """
+
+    
+}
+
+
+//Channels
+
+
+workflow {
+    tellu = Channel.fromPath(file("$params.weights"))
+    images = Channel.fromPath("$params.inputdir")
+        
+    RunTellu(images, tellu)
+    TidyData(RunTellu.out.detections.collect())
+}
