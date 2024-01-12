@@ -64,7 +64,7 @@ process RunTellu {
 
     script:
     """
-    python /usr/src/app/detect.py --weights $tellu --img 416 --conf 0.35 --project out --source $images --save-txt  --save-conf --hide-labels 
+    python /usr/src/app/detect.py --weights $tellu --img 416 --conf 0.35 --project out --source $images --save-txt  --save-conf  
     """
 
    
